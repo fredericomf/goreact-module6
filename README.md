@@ -128,7 +128,7 @@ sudo apt-get install -y nodejs
 ```
 
 PM2: Um serviço do node que vai manter a aplicação no ar. Se ela cair ele sobe novamente.
-SERVE: Um minu servidor NODE que serve para rodar aplicações estáticas
+SERVE: Um mini servidor NODE que serve para rodar aplicações estáticas
 
 3. Baixar o projeto GIT, usando o "git clone"
 
@@ -145,6 +145,8 @@ $ npm run build
 ```bash
 $ pm2 serve build
 ```
+
+NOTA_ESTUDO: O "build" do comando acima refere-se a pasta com o build, criada em "npm run build". O comando deve ser rodado dentro da pasta do projeto para encontrar o build.
 
 **ATENÇÃO: O serve já coloca a aplicação na porta 8080**
 
@@ -193,3 +195,40 @@ NOTA_ESTUDO: O caminho "root /home/deploy/goreact-module3;" tem que ser exato pa
 ```bash
 service nginx restart
 ```
+
+## AUTOMATIZANDO A ENTREGA
+
+1. Criar uma conta no http://buddy.works
+
+NOTA_ESTUDO: Ferramenta para iniciantes em CI
+
+2. Criar um novo projeto GitHub, anexando um repositório existente.
+
+NOTA_ESTUDO: Neste momento, se você não havia autorizado o buddy a ter acesso ao seu GitHub, você deve conceder este acesso.
+
+3. Adicione um novo Pipeline, clicando em "Add a new pipeline"
+
+4. Como faremos o build e o deploy automaticamente, o nome dessa pipeline será: "Build and Deploy"
+
+5. Em TRIGGER MODE selecionar "On push".
+
+6. Em BRANCH OR TAG THAT TRIGGERS THE PIPELINE selecione "Single branch" e "master".
+
+NOTA_ESTUDO: Toda a vez que fizermos um Push na Master o processo de Build and Deploy será disparado.
+
+7. Agora vamos adicionar uma action. Temos várias Actions disponíveis para integrar com o serviço que estamos utilizando de hospedagem (Ex. Azure, Amazon, Digital Ocean).
+   Caso o serviço que utilizamos não esteja listado podemos usar lowends como: ssh, sftp ou ftp
+
+NOTA_ESTUDO: Decidi seguir a linha do SSH puro.
+
+8. Em "RUN SSH COMMANDS":
+
+```bash
+git pull
+npm install
+npm run build
+pm2 restart #[COLOCAR O APP NAME (descubra rodando "pm2 list" no terminal do servidor)]
+```
+
+NOTA_ESTUDO: Lembrar que deve ser escolhida a pasta do projeto no servidor.
+NOTA_ESTUDO2: O 'git pull' só é necessário para projetos SSH. Usando Azure, Amazon e outros isso é automático(até onde testei ;)).
